@@ -1,1 +1,5 @@
 Material for effector test module of training course.
+    app-template.yaml  Template catalog for python web server app
+    server-entity.yaml Catalog for entity instantiating the server template
+    effector-test.yaml Tests for the effectors, using the entity from server-entity
+
