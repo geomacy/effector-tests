@@ -1,0 +1,8 @@
+brooklyn.catalog:
+  version: 1.0
+  items:
+
+  - id: python-web-server
+    item:
+      type: python-web-server-template
+      name: Python Web Server
