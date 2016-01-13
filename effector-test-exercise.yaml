@@ -1,0 +1,53 @@
+name: Python webserver tests
+
+location:
+  byon:
+    user: vagrant
+    password: vagrant
+    hosts:
+      - 10.10.10.101
+      - 10.10.10.102
+      - 10.10.10.103
+      - 10.10.10.104
+
+services:
+- id: testserver
+  type: python-web-server
+
+- type: org.apache.brooklyn.test.framework.TestCase
+  name: 1 Test index page
+  brooklyn.children:
+  - type: org.apache.brooklyn.test.framework.TestSensor
+    name: 1.0 Test server should start
+    target: $brooklyn:component("testserver")
+    sensor: service.isUp
+    assert:
+    - equals: true
+    timeout: 10s
+
+  - type: org.apache.brooklyn.test.framework.TestHttpCall
+    name: 1.1 Status Code should be 200
+    url: $brooklyn:component("testserver").attributeWhenReady("main.uri")
+    applyAssertionTo: status
+    timeout: 2s
+    assert:
+      equalTo: 200
+
+  - type: org.apache.brooklyn.test.framework.TestHttpCall
+    name: 1.2 Body should not contain log link
+    url: $brooklyn:component("testserver").attributeWhenReady("main.uri")
+    assert:
+      matches: "(?s)^((?!Logs).)*$"
+
+  - type: org.apache.brooklyn.test.framework.TestEffector
+    name: 2.1 invoke show log effector
+    target: $brooklyn:component("testserver")
+    effector: showlog
+
+  - type: org.apache.brooklyn.test.framework.TestHttpCall
+    name: 2.2 Body should now contain log link
+    timeout: 5s
+    url: $brooklyn:component("testserver").attributeWhenReady("main.uri")
+    assert:
+      contains: "Logs"
+
